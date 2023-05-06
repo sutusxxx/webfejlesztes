@@ -1,0 +1,64 @@
+<div class="container">
+    <div class="chat-list mat-elevation-z5">
+        <div class="search-input">
+            <mat-form-field>
+                <input matInput placeholder="Search for users..." [formControl]="searchForm" [matAutocomplete]="users">
+            </mat-form-field>
+            <mat-autocomplete #users="matAutocomplete">
+                <mat-option *ngFor="let user of users$ | async" (click)="openChat(user)">
+                    {{ user.displayName }}
+                </mat-option>
+            </mat-autocomplete>
+        </div>
+        <mat-selection-list [multiple]="false" [formControl]="chatForm">
+            <mat-divider></mat-divider>
+            <mat-list-option *ngFor="let chat of chats$ | async" [value]="chat.id">
+                <p mat-line class="chat-title">
+                    <span class="chat-name">
+                        {{ chat.chatName }}
+                    </span>
+                    <span class="chat-date">
+                        {{ chat.lastMessageDate | date }}
+                    </span>
+                </p>
+                <p mat-line class="chat-message">
+                    {{ chat.lastMessage }}
+                </p>
+                <mat-divider></mat-divider>
+            </mat-list-option>
+        </mat-selection-list>
+    </div>
+    <div class="messages mat-elevation-z5">
+        <div class="messages-header" *ngIf="selectedChat$ | async as selectedChat; else notSelected">
+            <h2>{{ selectedChat.chatName }}</h2>
+        </div>
+        <ng-template #notSelected>
+            <div class="messages-header">
+                <h2>Messenger</h2>
+            </div>
+        </ng-template>
+        <mat-divider></mat-divider>
+        <div class="chat">
+            <ng-container *ngIf="currentUser$ | async as user">
+                <div *ngFor="let message of messages$ | async" class="message-container"
+                    [ngClass]="{ 'sender': message.senderId === user.uid }">
+                    <div class="message" [ngClass]="{ 'sender': message.senderId === user.uid }">
+                        {{ message.text }}
+                        <span class="date">
+                            {{ message.date | date }}
+                        </span>
+                    </div>
+                </div>
+                <div #endOfChat></div>
+            </ng-container>
+        </div>
+        <div class="input-wrapper" *ngIf="selectedChat$ | async">
+            <mat-form-field appearance="outline">
+                <input [formControl]="messageForm" matInput placeholder="Aa" (keydown.enter)="sendMessage()">
+                <button mat-icon-button matSuffix (click)="sendMessage()">
+                    <mat-icon>send</mat-icon>
+                </button>
+            </mat-form-field>
+        </div>
+    </div>
+</div>

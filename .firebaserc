@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "chat-app-8ebd0": {
+      "hosting": {
+        "chat-app": [
+          "chat-app-8ebd0"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "chat-app-8ebd0"
+  }
+}
