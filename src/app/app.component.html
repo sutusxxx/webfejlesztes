@@ -1,5 +1,5 @@
 <mat-toolbar>
-    <a class="title" href="/messenger">Chat</a>
+    <a class="title" href="/messenger">Messenger</a>
     <ng-container *ngIf="user$ | async as user; else loginButton">
         <button mat-button>
             <button mat-button [matMenuTriggerFor]="userMenu">
@@ -21,6 +21,6 @@
 </div>
 
 <mat-menu #userMenu="matMenu">
-    <button mat-menu-item routerLink="profile">Profile</button>
+    <button mat-menu-item routerLink="/profile">Profile</button>
     <button mat-menu-item (click)="logout()">Logout</button>
 </mat-menu>

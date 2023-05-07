@@ -5,6 +5,7 @@ import { switchMap } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { passwordValidator } from 'src/app/validators/password-validator';
+import { pathToFileURL } from 'url';
 
 @Component({
   selector: 'app-registration',

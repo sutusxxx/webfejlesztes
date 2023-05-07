@@ -4,7 +4,7 @@ export class User implements IUser {
     uid: string;
     email: string;
     displayName: string;
-    photoURL?: string;
+    image?: string;
 
     constructor(id: string, email: string, name: string) {
         this.uid = id;

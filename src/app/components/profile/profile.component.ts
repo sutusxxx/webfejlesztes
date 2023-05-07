@@ -1,40 +1,61 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { BaseComponent } from '@components/base/base.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
-import { takeUntil } from 'rxjs';
+import { concatMap, takeUntil } from 'rxjs';
+import { User, user } from '@angular/fire/auth';
+import { ImageUploadService } from 'src/app/services/image-upload.service';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-profile',
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+    selector: 'app-profile',
+    templateUrl: './profile.component.html',
+    styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent extends BaseComponent implements OnInit {
-  user$ = this.authService.currentUser$;
+    user$ = this.authService.currentUser$;
 
-  profileForm = new FormGroup({
-    id: new FormControl(''),
-    email: new FormControl(''),
-    displayName: new FormControl(''),
-  })
+    profileForm = new FormGroup({
+        uid: new FormControl(''),
+        email: new FormControl('', Validators.required),
+        displayName: new FormControl('', Validators.required),
+    })
 
-  constructor(
-    private authService: AuthService,
-    private userService: UserService
-  ) {
-    super();
-  }
+    constructor(
+        private authService: AuthService,
+        private userService: UserService,
+        private imageUploadService: ImageUploadService,
+        private readonly router: Router
+    ) {
+        super();
+    }
 
-  ngOnInit(): void {
-    this.userService.currentUser$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe(user => {
-        this.profileForm.patchValue({ ...user })
-      })
-  }
+    ngOnInit(): void {
+        this.userService.currentUser$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(user => {
+                this.profileForm.patchValue({ ...user })
+            })
+    }
 
-  save() {
-    this.userService.saveUser(this.profileForm.value).subscribe();
-  }
+    uploadImage(event: any, user: User): void {
+        this.imageUploadService.uploadImage(event.target.files[0], `images/profile/${user.uid}`).pipe(
+            concatMap(photoURL => this.authService.updateProfileData({ photoURL }))
+        ).subscribe();
+    }
+
+    saveProfile(): void {
+        const profileData = this.profileForm.value;
+        this.userService.saveUser(profileData).pipe(
+            concatMap(() => this.authService.updateProfileData(profileData))
+        ).subscribe();
+    }
+
+    deleteUser(): void {
+        const profileData = this.profileForm.value;
+        this.userService.deleteProfile(profileData.uid).pipe(
+            concatMap(() => this.authService.deleteAccount())
+        ).subscribe(() => this.router.navigate(['/login']))
+    }
 }

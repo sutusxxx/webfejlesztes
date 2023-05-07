@@ -9,7 +9,7 @@ import { UserService } from './services/user.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'chat-app';
+  title = 'Messenger';
 
   user$ = this.userService.currentUser$;
 

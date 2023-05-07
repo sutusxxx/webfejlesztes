@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable, from, of, switchMap } from 'rxjs';
+import { Observable, from, of, switchMap } from 'rxjs';
 import { User } from '../models';
-import { Firestore, collection, collectionData, doc, docData, query, setDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, deleteDoc, doc, docData, query, setDoc, updateDoc } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
+import { profilePicture } from 'src/app/constants/placeholder';
 
 @Injectable({
     providedIn: 'root'
@@ -16,12 +17,18 @@ export class UserService {
 
     createUser(user: User): Observable<void> {
         const ref = doc(this.firestore, 'users', user?.uid);
+        user.image = profilePicture.data;
         return from(setDoc(ref, user));
     }
 
     saveUser(user: User): Observable<void> {
         const ref = doc(this.firestore, 'users', user?.uid);
         return from(updateDoc(ref, { ...user }));
+    }
+
+    deleteProfile(userId: string): Observable<void> {
+        const ref = doc(this.firestore, 'users', userId);
+        return from(deleteDoc(ref));
     }
 
     get currentUser$(): Observable<User | null> {
